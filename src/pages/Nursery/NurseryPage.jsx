@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import plants, { SEGMENT } from "../../data/plants";
+import plants, { SEGMENT } from "../../data/plantsApi";
 import PlantBabyCard from "../../components/core/PlantBabyCard";
 
 const TAGS = [SEGMENT.U199, SEGMENT.U299, SEGMENT.U399, SEGMENT.U599, SEGMENT.U999];

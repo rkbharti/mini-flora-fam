@@ -1,5 +1,5 @@
 import { createContext, useContext, useMemo, useState } from "react";
-import plants from "../data/plants";
+import plants from "../data/plantsApi";
 
 const CartContext = createContext();
 

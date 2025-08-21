@@ -1,36 +1,67 @@
-import { Routes, Route, NavLink } from "react-router-dom";
-import NurseryPage from "./pages/Nursery/NurseryPage";
-import PlantDetail from "./pages/Nursery/PlantDetail";
-import Checkout from "./pages/Checkout/Checkout";
-import Family from "./pages/Family/Family";
-import { useCart } from "./context/CartContext";
+import React, { useEffect, useState } from "react";
+import { supabase } from "./supabaseClient";
 
-export default function App() {
-  const { totalQty } = useCart();
+function App() {
+  const [plants, setPlants] = useState([]);
+  const [cart, setCart] = useState([]);
+
+  useEffect(() => {
+    const fetchPlants = async () => {
+      const { data, error } = await supabase.from("plants").select("*");
+      if (error) {
+        console.error("Supabase fetch error:", error.message);
+      } else {
+        setPlants(data);
+      }
+    };
+
+    fetchPlants();
+  }, []);
+
+  const addToCart = (plant) => {
+    setCart([...cart, plant]);
+  };
 
   return (
-    <div className="app">
-      <header className="navbar">
-        <NavLink to="/" className="brand">Mini Flora Fam</NavLink>
-        <nav className="nav">
-          <NavLink to="/">Nursery</NavLink>
-          <NavLink to="/family">Family</NavLink>
-          <NavLink to="/checkout">Cart ({totalQty})</NavLink>
-        </nav>
-      </header>
+    <div style={{ padding: "20px" }}>
+      <h1>🌱 Mini Flora Fam</h1>
 
-      <main className="container">
-        <Routes>
-          <Route path="/" element={<NurseryPage />} />
-          <Route path="/plant/:id" element={<PlantDetail />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/family" element={<Family />} />
-        </Routes>
-      </main>
+      <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
+        {plants.map((p) => (
+          <div
+            key={p.id}
+            style={{
+              border: "1px solid #ccc",
+              padding: "10px",
+              borderRadius: "10px",
+              width: "200px",
+              textAlign: "center",
+            }}
+          >
+            <img
+              src={p.image_url}
+              alt={p.name}
+              style={{ width: "100%", borderRadius: "8px" }}
+            />
+            <h3>{p.name}</h3>
+            <p>₹{p.price}</p>
+            <button onClick={() => addToCart(p)}>Add to Cart</button>
+          </div>
+        ))}
+      </div>
 
-      <footer className="footer">
-        <p>Delivery window: <strong>6–12 hours</strong> within serviceable areas.</p>
-      </footer>
+      <h2>🛒 Cart</h2>
+      {cart.length === 0 ? (
+        <p>No items in cart.</p>
+      ) : (
+        <ul>
+          {cart.map((c, index) => (
+            <li key={index}>{c.name} - ₹{c.price}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
+
+export default App;
